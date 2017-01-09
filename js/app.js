@@ -1,10 +1,12 @@
 function createMaze() {
+    console.log("011");
     var file = document.getElementById("maze-file");
-
-    $.getJSON(file.name, function(json) {
+alert("avant");
+    $.getJSON(file[0].name, function(json) {
+        alert("hello");
         console.log(json);
     });
-
+alert("apres");
     /*
     var c = document.getElementById("maze");
     var ctx = c.getContext("2d");

@@ -16,11 +16,14 @@
             <div class="row">
                 <div class="col-md-6 col-md-offset-3 text-center">
                     <div class="form-group">
-                        <input type="file" id="maze-file"></input>
-                        <p class="help-block">Choose a maze file (JSON).</p>
+                        <form action="upload-file" method="post" enctype="multipart/form-data">
+                            <input type="file" name="maze-file"></input>
+                            <p class="help-block">Choose a maze file (JSON).</p>
+                            <input type="submit" name="submit">Submit</input>
+                        </form>
                     </div>
                 </div>
-                <button class="btn" onclick="createMaze()">Test</button>
+
             </div>
             <div class="row">
                 <div class="col-md-6 col-md-offset-3 text-center">

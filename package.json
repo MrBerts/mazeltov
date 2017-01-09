@@ -8,5 +8,6 @@
     "start": "node server.js"
   },
   "dependencies": {
+    "multer": "^1.2.1"
   }
 }
