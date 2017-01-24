@@ -40,12 +40,11 @@ app.post('/upload-file', upload.single('maze-file'), function(req,res){
     wallsFile = obj;
 
     buildMaze();
-    solveMaze();
+    //solveMaze();
 
-    //io.sockets.emit('message', 'bonjour');
     // Go back to index.html
-
-    res.redirect('/');
+    res.end("terminé");
+    //io.sockets.emit('walls', obj);
 });
 
 function buildMaze() {

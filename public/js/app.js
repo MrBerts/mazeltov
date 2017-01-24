@@ -1,23 +1,58 @@
 var socket = io.connect('http://localhost:8080');
-var c=document.getElementById("maze");
-var ctx=c.getContext("2d");
 
-socket.on('message', function(message) {
-    console.log('Le serveur a un message pour vous : ' + message);
-    draw();
+var c = document.getElementById("maze");
+var ctx = c.getContext("2d");
+
+var cSize = 500;
+var width;
+var height;
+var deltaW;
+var deltaH;
+var walls;
+
+$(document).ready(function() {
+
+    $('#mazeForm').submit(function() {
+
+        $(this).ajaxSubmit({
+
+            error: function(xhr) {
+        		alert('Error: ' + xhr.status);
+            },
+
+            success: function(response) {
+                alert(response);
+            }
+    	});
+    
+	    //Very important line, it disable the page refresh.
+	    return false;
+    });    
 });
 
-function draw() {
-	// Red rectangle
-	ctx.beginPath();
-	ctx.lineWidth="6";
-	ctx.strokeStyle="red";
-	ctx.rect(3,3,3,3); 
-	ctx.stroke();
+socket.on('walls', function(wallsFile) {
+    console.log('Draw walls');
 
-	ctx.beginPath();
-	ctx.lineWidth="3";
-	ctx.strokeStyle="green";
-	ctx.rect(3,3,3,3); 
+    width = wallsFile.width;
+    height = wallsFile.height;
+    deltaW = cSize / width;
+    deltaH = cSize / height;
+    walls = wallsFile.walls;
+
+    ctx.beginPath();
+    wallsFile.walls.forEach(function(tuple) {
+    	drawWall(tuple);
+    });
+});
+
+function drawWall(tuple) {
+
+	var start = [tuple[1][1] * deltaW, tuple[1][0] * deltaH];
+	var temp = [tuple[1][0] - tuple[0][0], tuple[1][1] - tuple[0][1]];
+	var end = [start[0] + temp[0] * deltaW, start[1] + temp[1] * deltaH];
+
+
+	ctx.moveTo(start[0],start[1]);
+	ctx.lineTo(end[0],end[1]);
 	ctx.stroke();
 }
