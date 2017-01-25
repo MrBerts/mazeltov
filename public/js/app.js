@@ -20,7 +20,7 @@ $(document).ready(function() {
             },
 
             success: function(response) {
-                console.log(response);
+	
                 width = response.width;
                 height = response.height;
                 deltaW = cSize / width;
@@ -35,9 +35,9 @@ $(document).ready(function() {
 });
 
 function drawSolution(file) {
-	ctx.clearRect(0, 0, cSize, cSize);
+	ctx.clearRect(0, 0, c.width, c.height);
+
 	// Draw the maze
-	console.log(file.walls);
 	ctx.beginPath();
 
 	file.walls.forEach(function (tuple) {
@@ -56,11 +56,21 @@ function drawSolution(file) {
 	ctx.stroke();
 
 	// Draw the solution
-	/*
-	file.solution.forEach(function (tuple) {
+	ctx.beginPath();
 
+	var solution = file.solution;
+	ctx.moveTo(solution[0][0] * deltaW - ((1 / 2) * deltaW), solution[0][1] * deltaH - ((1 / 2) * deltaH));
+
+	for (var i = 1; i < solution.length; i++) {
+
+		var x = solution[i][0] * deltaW - ((1 / 2) * deltaW);
+		var y = solution[i][1] * deltaH - ((1 / 2) * deltaH);
+		ctx.lineTo(y, x);
 		
-	});
-	*/
+	}
+
+	ctx.strokeStyle = "#00ff00";
+	ctx.lineWidth = 2;
+	ctx.stroke();
 }
 

@@ -7,7 +7,6 @@ var fs = require('fs');
 
 var wallsFile;
 var maze = [];
-var solution = [];
 
 // App route
 var app = express();
@@ -37,18 +36,16 @@ app.post('/upload-file', upload.single('mazeFile'), function(req,res){
     //TODO
     //Vérification du fichier
 
-    buildMaze();
-    solveMaze();
+    buildSolveMaze();
 
     // Go back to index.html
     res.setHeader('Content-Type', 'application/json');
     res.send(wallsFile);
-    console.log(wallsFile);
     res.end();
     //io.sockets.emit('walls', obj);
 });
 
-function buildMaze() {
+function buildSolveMaze() {
 
     // Init the maze array
     var i, j;
@@ -76,10 +73,14 @@ function buildMaze() {
     maze[wallsFile.start[0] * 2 + 1][wallsFile.start[1] * 2 + 1] = 2;
 
     //Define end
-    maze[wallsFile.end[0] * 2 + 1][wallsFile.end[1] * 2 + 1] = 3;    
+    maze[wallsFile.end[0] * 2 + 1][wallsFile.end[1] * 2 + 1] = 3;
+
+    solveMaze();
 }
 
 function solveMaze() {
+
+    var solution = [];
 
     //                left     down    right   up
     var direction = [[0, -1], [1, 0], [0, 1], [-1, 0]];
@@ -94,7 +95,7 @@ function solveMaze() {
     var signe = 1;
 
     // Test win
-    if (current == wallsFile.end) {
+    if (maze[current[0]][current[1]] == 3) {
         return result;
     }
 
@@ -147,10 +148,20 @@ function solveMaze() {
 
         previous = current.concat();
         current = next.concat();
-        testPush(current);
+        testPush(solution, current);
     }
 
+    scaleSolution(solution);
     wallsFile.solution = solution;
+}
+
+function scaleSolution(solution) {
+
+    solution.forEach(function(tuple) {
+
+        tuple[0] = (tuple[0] + 1) / 2;
+        tuple[1] = (tuple[1] + 1) / 2;
+    });
 }
 
 function testCell(cell) {
@@ -167,7 +178,7 @@ function testCell(cell) {
     }
 }
 
-function testPush(cell) {
+function testPush(solution, cell) {
 
     if (solution[solution.length - 2][0] === cell[0] && solution[solution.length - 2][1] === cell[1]) {
         solution.pop();
