@@ -30,20 +30,21 @@ io.sockets.on('connection', function (socket) {
     socket.emit('message', 'Vous êtes bien connecté !');
 });
 
-app.post('/upload-file', upload.single('maze-file'), function(req,res){
+app.post('/upload-file', upload.single('mazeFile'), function(req,res){
     // Read the JSON file
-    var obj = JSON.parse(fs.readFileSync(req.file.path, 'utf8'));
+    wallsFile = JSON.parse(fs.readFileSync(req.file.path, 'utf8'));
 
     //TODO
     //Vérification du fichier
 
-    wallsFile = obj;
-
     buildMaze();
-    //solveMaze();
+    solveMaze();
 
     // Go back to index.html
-    res.end("terminé");
+    res.setHeader('Content-Type', 'application/json');
+    res.send(wallsFile);
+    console.log(wallsFile);
+    res.end();
     //io.sockets.emit('walls', obj);
 });
 
@@ -148,7 +149,8 @@ function solveMaze() {
         current = next.concat();
         testPush(current);
     }
-    console.log(solution);
+
+    wallsFile.solution = solution;
 }
 
 function testCell(cell) {
