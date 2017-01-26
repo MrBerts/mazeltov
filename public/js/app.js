@@ -1,6 +1,7 @@
 //var socket = io.connect('http://localhost:8080');
 
 var c = document.getElementById("mazeCanvas");
+c.style.display = 'none';
 var ctx = c.getContext("2d");
 
 var cSize = 500;
@@ -16,7 +17,8 @@ $(document).ready(function() {
         $(this).ajaxSubmit({
 
             error: function(xhr) {
-        		alert('Error: ' + xhr.status);
+            	$('.file-feedback').css('color', '#ff4c4c');
+        		$('.file-feedback').text(xhr.responseText);
             },
 
             success: function(response) {
@@ -31,10 +33,23 @@ $(document).ready(function() {
     
 	    //Very important line, it disable the page refresh.
 	    return false;
-    });    
+    });
+
+    $(document).on('change', ':file', function() {
+	    var input = $(this),
+        	numFiles = input.get(0).files ? input.get(0).files.length : 1,
+        	label = input.val().replace(/\\/g, '/').replace(/.*\//, '');
+	    input.trigger('fileselect', label);
+	});
+
+	$(':file').on('fileselect', function(event, label) {
+		$('.file-feedback').css('color', '#000000');
+        $('.file-feedback').text(label);
+    });
 });
 
 function drawSolution(file) {
+	c.style.display = 'block';
 	ctx.clearRect(0, 0, c.width, c.height);
 
 	// Draw the maze

@@ -1,7 +1,29 @@
-.no-style {
-    display: none; !important
+body { 
+	padding-top: 70px; 
+}
+
+h3 {
+	margin-top: 10px;
+}
+
+label, h3 {
+	font-family: 'Roboto', sans-serif;
+}
+
+.btn-submit {
+	margin-top: 15px;
 }
 
 .maze {
 	border: 1px solid #000000;
+}
+
+.disabled {
+   color: darkgrey;
+   background-color: grey;
+}
+
+.file-feedback {
+	margin-left: 5px;
+	font-weight: normal;
 }

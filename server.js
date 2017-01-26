@@ -31,18 +31,22 @@ io.sockets.on('connection', function (socket) {
 
 app.post('/upload-file', upload.single('mazeFile'), function(req,res){
     // Read the JSON file
-    wallsFile = JSON.parse(fs.readFileSync(req.file.path, 'utf8'));
+    if (req.file === undefined) {
+        res.status(500).send('No file selected');
+        res.end();
+    } else {
+        wallsFile = JSON.parse(fs.readFileSync(req.file.path, 'utf8'));
 
-    //TODO
-    //Vérification du fichier
+        //TODO
+        //Vérification du fichier
 
-    buildSolveMaze();
+        buildSolveMaze();
 
-    // Go back to index.html
-    res.setHeader('Content-Type', 'application/json');
-    res.send(wallsFile);
-    res.end();
-    //io.sockets.emit('walls', obj);
+        // Go back to index.html
+        res.setHeader('Content-Type', 'application/json');
+        res.send(wallsFile);
+        res.end();
+    }
 });
 
 function buildSolveMaze() {
