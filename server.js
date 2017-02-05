@@ -40,7 +40,8 @@ app.post('/upload-file', upload.single('mazeFile'), function(req,res){
         //TODO
         //Vérification du fichier
 
-        buildSolveMaze();
+        buildMaze();
+        solveMaze();
 
         // Go back to index.html
         res.setHeader('Content-Type', 'application/json');
@@ -49,19 +50,19 @@ app.post('/upload-file', upload.single('mazeFile'), function(req,res){
     }
 });
 
-function buildSolveMaze() {
+function buildMaze() {
 
     // Init the maze array
     var i, j;
-    for (i = 1; i <= wallsFile.height * 2 - 1; i++) {
+    for (i = 1; i <= wallsFile.width * 2 - 1; i++) {
         maze[i] = [];
-        for (j = 1; j <= wallsFile.width * 2 - 1; j++) {
+        for (j = 1; j <= wallsFile.height * 2 - 1; j++) {
             maze[i][j] = 1;
         }
     }
 
     // Define walls and path
-    var cellX1, cellY1, cellX2, cellY2, wallX, wallY, temp;
+    var cellX1, cellY1, cellX2, cellY2, wallX, wallY;
     wallsFile.walls.forEach(function(tuple) {
         cellX1 = (tuple[0][0] + 1) * 2 - 1;
         cellY1 = (tuple[0][1] + 1) * 2 - 1;
@@ -73,13 +74,14 @@ function buildSolveMaze() {
         maze[wallX][wallY] = 0;
     });
 
+        console.log(maze);
+
     //Define start
     maze[wallsFile.start[0] * 2 + 1][wallsFile.start[1] * 2 + 1] = 2;
 
     //Define end
     maze[wallsFile.end[0] * 2 + 1][wallsFile.end[1] * 2 + 1] = 3;
 
-    solveMaze();
 }
 
 function solveMaze() {
@@ -89,70 +91,69 @@ function solveMaze() {
     //                left     down    right   up
     var direction = [[0, -1], [1, 0], [0, 1], [-1, 0]];
     var move =      [[0, -2], [2, 0], [0, 2], [-2, 0]];
-    var current = [wallsFile.start[0] + 1, wallsFile.start[1] + 1];
+    var current = [wallsFile.start[0] * 2 + 1, wallsFile.start[1] * 2 + 1];
     var previous = current
     var next = [];
     
     solution.push(current);
 
-    var deltaX = 2, deltaY = 0, temp;
+    var temp;
     var signe = 1;
 
     // Test win
-    if (maze[current[0]][current[1]] == 3) {
-        return result;
-    }
+    if (maze[current[0]][current[1]] != 3) {
 
-    // Find the first next from start
-    var i = -1;
-    do {
-        i++;
-        next[0] = current[0] + direction[i][0];
-        next[1] = current[1] + direction[i][1];
-    } while (!testCell(next))
-
-    next[0] = current[0] + move[i][0];
-    next[1] = current[1] + move[i][1];
-    
-    previous = current.concat();
-    current = next.concat();
-    
-    solution.push(current);
-
-    // Find a path
-    while (maze[current[0]][current[1]] != 3) {
-
-        temp = [previous[0] - current[0], previous[1] - current[1]];
-        // Find next cell
-        if (temp[0] < 0) {
-            i = 0;
-        } else if (temp[0] > 0) {
-            i = 2;
-        } else if (temp[1] < 0) {
-            i = 1;
-        } else if (temp[1] > 0) {
-            i = 3;
-        } else {
-            console.log("Error");
-            return -1;
-        }
-
+        // Find the first next from start
+        var i = -1;
         do {
+            i++;
             next[0] = current[0] + direction[i][0];
             next[1] = current[1] + direction[i][1];
-            i++;
-            i %= direction.length;
         } while (!testCell(next))
-
-        i--;
-        if (i == -1) i = move.length - 1;
 
         next[0] = current[0] + move[i][0];
         next[1] = current[1] + move[i][1];
-
+        
         previous = current.concat();
         current = next.concat();
-        testPush(solution, current);
+        
+        solution.push(current);
+
+        // Find a path
+        while (maze[current[0]][current[1]] != 3) {
+
+            temp = [previous[0] - current[0], previous[1] - current[1]];
+            // Find next cell
+            if (temp[0] < 0) {
+                i = 0;
+            } else if (temp[0] > 0) {
+                i = 2;
+            } else if (temp[1] < 0) {
+                i = 1;
+            } else if (temp[1] > 0) {
+                i = 3;
+            } else {
+                console.log("Error");
+                return -1;
+            }
+
+            do {
+                next[0] = current[0] + direction[i][0];
+                next[1] = current[1] + direction[i][1];
+                i++;
+                i %= direction.length;
+            } while (!testCell(next))
+
+            i--;
+            if (i == -1) i = move.length - 1;
+
+            next[0] = current[0] + move[i][0];
+            next[1] = current[1] + move[i][1];
+
+            previous = current.concat();
+            current = next.concat();
+            testPush(solution, current);
+        }
     }
 
     scaleSolution(solution);
@@ -171,9 +172,9 @@ function scaleSolution(solution) {
 function testCell(cell) {
 
     if (    cell[0] <= 0 ||
-            cell[0] >= wallsFile.height * 2 ||
+            cell[0] >= wallsFile.width * 2 ||
             cell[1] <= 0 ||
-            cell[1] >= wallsFile.width * 2) {
+            cell[1] >= wallsFile.height * 2) {
         return false;
     } else if (maze[cell[0]][cell[1]] == 0) {
         return false;
@@ -183,8 +184,9 @@ function testCell(cell) {
 }
 
 function testPush(solution, cell) {
+    console.log("solution", solution);
 
-    if (solution[solution.length - 2][0] === cell[0] && solution[solution.length - 2][1] === cell[1]) {
+    if (solution.length >= 2 && solution[solution.length - 2][0] === cell[0] && solution[solution.length - 2][1] === cell[1]) {
         solution.pop();
     } else {
         solution.push(cell);
