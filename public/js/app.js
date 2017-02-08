@@ -1,8 +1,6 @@
-//var socket = io.connect('http://localhost:8080');
 
-var c = document.getElementById("mazeCanvas");
-c.style.display = 'none';
-var ctx = c.getContext("2d");
+var c;
+var ctx;
 
 var cSize = 500;
 var width;
@@ -10,18 +8,27 @@ var height;
 var deltaW;
 var deltaH;
 
-var startRadius = 5;
-var endRadius = 3;
-var lineWidth = 2;
+var wallsColor = '#000000';
+var wallsWidth = 2;
+var pathColor = '#00ff00';
+var pathWidth = 2;
+var endColor = '#ff0000';
+var startRadius = 3;
+var endRadius = 2;
+
+var textColor = '#000000';
+var textErrorColor = '#ff4c4c';
 
 $(document).ready(function() {
+	c = document.getElementById("mazeCanvas");
+	ctx = c.getContext("2d");
 
     $('#mazeForm').submit(function() {
 
         $(this).ajaxSubmit({
 
             error: function(xhr) {
-            	$('.file-feedback').css('color', '#ff4c4c');
+            	$('.file-feedback').css('color', textErrorColor);
         		$('.file-feedback').text(xhr.responseText);
             },
 
@@ -31,7 +38,6 @@ $(document).ready(function() {
                 width = response.height;
                 deltaW = cSize / width;
                 deltaH = cSize / height;
-                console.log(width, deltaW, height, deltaH);
                 drawSolution(response);
             }
     	});
@@ -48,7 +54,7 @@ $(document).ready(function() {
 	});
 
 	$(':file').on('fileselect', function(event, label) {
-		$('.file-feedback').css('color', '#000000');
+		$('.file-feedback').css('color', textColor);
         $('.file-feedback').text(label);
     });
 });
@@ -70,8 +76,8 @@ function drawSolution(file) {
 		ctx.lineTo(end[0],end[1]);
 	});
 
-	ctx.strokeStyle = '#000000';
-	ctx.lineWidth = lineWidth;
+	ctx.strokeStyle = wallsColor;
+	ctx.lineWidth = wallsWidth;
 	ctx.stroke();
 
 	// Draw the solution
@@ -89,25 +95,25 @@ function drawSolution(file) {
 		
 	}
 
-	ctx.strokeStyle = '#00ff00';
-	ctx.lineWidth = 2;
+	ctx.strokeStyle = pathColor;
+	ctx.lineWidth = pathWidth;
 	ctx.stroke();
 
 	// Draw start point
 	ctx.beginPath();
     ctx.arc(solution[0][1] * deltaW - ((1 / 2) * deltaW), solution[0][0] * deltaH - ((1 / 2) * deltaH), startRadius, 0, 2 * Math.PI);
-    ctx.fillStyle = '#00ff00';
+    ctx.fillStyle = pathColor;
     ctx.fill();
-    ctx.strokeStyle = '#00ff00';
+    ctx.strokeStyle = pathColor;
     ctx.stroke();
 
     // Draw end point
     var endPoint = solution[solution.length - 1];
     ctx.beginPath();
     ctx.arc(endPoint[1] * deltaW - ((1 / 2) * deltaW), endPoint[0] * deltaH - ((1 / 2) * deltaH), endRadius, 0, 2 * Math.PI);
-    ctx.fillStyle = '#777777';
+    ctx.fillStyle = endColor;
     ctx.fill();
-    ctx.strokeStyle = '#777777';
+    ctx.strokeStyle = endColor;
     ctx.stroke();
 }
 
