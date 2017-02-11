@@ -33,7 +33,6 @@ $(document).ready(function() {
             },
 
             success: function(response) {
-	
                 height = response.width;
                 width = response.height;
                 deltaW = cSize / width;
