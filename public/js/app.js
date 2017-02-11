@@ -23,31 +23,38 @@ $(document).ready(function() {
 	c = document.getElementById("mazeCanvas");
 	ctx = c.getContext("2d");
 
+	// When the form is submit
     $('#mazeForm').submit(function() {
 
         $(this).ajaxSubmit({
 
+            // If an error occurs server side
             error: function(xhr) {
-            	$('.file-feedback').css('color', textErrorColor);
+                $('.file-feedback').css('color', textErrorColor);
         		$('.file-feedback').text(xhr.responseText);
             },
 
+            // If success
             success: function(response) {
+
+            	// Height and width are reverse since the input
+                // file defines [column, row] and the algorithm defines [row, column]
                 height = response.width;
                 width = response.height;
+
                 deltaW = cSize / width;
                 deltaH = cSize / height;
                 drawSolution(response);
             }
     	});
     
-	    //Very important line, it disable the page refresh.
+	    //Very important line, it disable the page refresh
 	    return false;
     });
 
+    // Handle feedback to the user after file selection
     $(document).on('change', ':file', function() {
 	    var input = $(this),
-        	numFiles = input.get(0).files ? input.get(0).files.length : 1,
         	label = input.val().replace(/\\/g, '/').replace(/.*\//, '');
 	    input.trigger('fileselect', label);
 	});
@@ -62,7 +69,7 @@ function drawSolution(file) {
 	c.style.display = 'block';
 	ctx.clearRect(0, 0, c.width, c.height);
 
-	// Draw the maze
+	// Draw the maze walls
 	ctx.beginPath();
 
 	file.walls.forEach(function (tuple) {
@@ -83,7 +90,7 @@ function drawSolution(file) {
 	ctx.beginPath();
 
 	var solution = file.solution;
-
+    
 	ctx.moveTo(solution[0][1] * deltaW - ((1 / 2) * deltaW), solution[0][0] * deltaH - ((1 / 2) * deltaH));
 
 	for (var i = 1; i < solution.length; i++) {
