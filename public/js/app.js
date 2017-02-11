@@ -26,12 +26,17 @@ $(document).ready(function() {
 	// When the form is submit
     $('#mazeForm').submit(function() {
 
+        $('.submit-feedback').text("Computing...");
+        $('.input-submit').prop('disabled', true);
+
         $(this).ajaxSubmit({
 
             // If an error occurs server side
             error: function(xhr) {
                 $('.file-feedback').css('color', textErrorColor);
         		$('.file-feedback').text(xhr.responseText);
+                $('.submit-feedback').text("");
+                $('.input-submit').prop('disabled', false);
             },
 
             // If success
@@ -45,6 +50,8 @@ $(document).ready(function() {
                 deltaW = cSize / width;
                 deltaH = cSize / height;
                 drawSolution(response);
+                $('.submit-feedback').text("");
+                $('.input-submit').prop('disabled', false);
             }
     	});
     
